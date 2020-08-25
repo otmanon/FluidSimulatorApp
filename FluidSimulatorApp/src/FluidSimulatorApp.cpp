@@ -100,7 +100,7 @@ int main(void)
 
 			if (currentTest) {
 		
-				currentTest->step(0.03);
+				currentTest->step(0.003);
 				currentTest->render();
 				ImGui::Begin("Test");
 				if (currentTest != testMenu && ImGui::Button("<-"))

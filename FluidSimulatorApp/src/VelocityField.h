@@ -101,12 +101,12 @@ public:
 	/*
 	Scale for visualizing velocity field;
 	*/
-	float vis_scale = 1.0f;
+	float vis_scale = 10.0f;
 	
 	/*
 	Draw velocity field from edges
 	*/
-	bool drawFieldEdgeWise= false;
+	bool drawFieldEdgeWise= true;
 
 	
 
@@ -378,12 +378,13 @@ public:
 				y2 = y1 + v.getIndex(i, j)*vis_scale;
 
 				vertices[vertex_index + 0] = x1;
-				vertices[vertex_index + 0] = y1;
-				vertices[vertex_index + 0] = x2;
-				vertices[vertex_index + 0] = y2;
+				vertices[vertex_index + 1] = y1;
+				vertices[vertex_index + 2] = x2;
+				vertices[vertex_index + 3] = y2;
+				vertex_index += 4;
 
-				indices[index_index] = index_index;
-				indices[index_index] = index_index + 1;
+				indices[index_index + 0] = index_index;
+				indices[index_index + 1] = index_index + 1;
 				index_index += 2;
 			}
 		}
@@ -395,7 +396,9 @@ public:
 	void swapBuffers()
 	{
 		u = u_backbuffer;
+		u.handleUnknownValues();
 		v = v_backbuffer;
+		v.handleUnknownValues();
 	}
 	/*
 	Renders velocity field

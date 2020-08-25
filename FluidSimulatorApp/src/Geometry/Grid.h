@@ -2,7 +2,7 @@
 #include <vector>
 #include "Drawable.h"
 #include <Eigen/Dense>
-
+#include <limits>
 
 struct GridCoordinates {
 	int i;
@@ -66,6 +66,22 @@ struct Grid2D
 		return coords;
 	}
 
+	/*
+	Goes through 2D array, checks if value is maximum allowed of type, if it is, set it to zero
+	*/
+	void handleUnknownValues()
+	{
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < columns; j++)
+			{
+				if (getIndex(i, j) < -10000000 || getIndex(i, j) > 10000000 )
+				{
+					setIndex(i, j, 0.0f);
+				}
+			}
+		}
+	}
 
 };
 

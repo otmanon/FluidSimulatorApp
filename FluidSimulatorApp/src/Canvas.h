@@ -51,7 +51,7 @@ struct Canvas2D : public Drawable
 	/*
 	Whether or not to draw grid edges in black
 	*/
-	bool drawEdges;
+	bool drawEdges = true;
 
 	/*
 	Initializes cell labels.
