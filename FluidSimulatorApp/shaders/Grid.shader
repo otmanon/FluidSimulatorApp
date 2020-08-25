@@ -49,13 +49,18 @@ void main()
 
 	unsigned int label = indexLabelGrid(i, j);
 	
-	if (label == uint(0))
-	{
-		color = vec4(0.31f, 0.23f, 0.62f, 1.0f);
-	}
-	else
+	if (label == uint(0)) // wall
 	{
 		color = vec4(0.25f, 0.25f, 0.30f, 1.0f);
+		
+	}
+	else if (label == uint(1))
+	{ //air
+		color = vec4(0.5f, 0.5f, 0.9f, 1.0f);
+	}
+	else if (label == uint(2))
+	{
+		color = vec4(0.31f, 0.23f, 0.62f, 1.0f); //liquid
 	}
 
 	if (u_DrawEdges)

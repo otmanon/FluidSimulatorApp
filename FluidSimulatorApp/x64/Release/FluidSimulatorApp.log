@@ -1,7 +1,57 @@
-﻿  FluidSimulatorApp.cpp
+﻿  IndexBuffer.cpp
+  Renderer.cpp
+  Shader.cpp
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\rendering\shader.cpp(125): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\rendering\shader.cpp(130): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  VertexArray.cpp
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\rendering\vertexarray.cpp(35): warning C4312: 'type cast': conversion from 'unsigned int' to 'const void *' of greater size
+  VertexBuffer.cpp
+  FluidSimulatorApp.cpp
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\particle.h(13): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\canvas.h(120): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\canvas.h(121): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(35): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(42): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(168): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(33): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(34): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(41): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(42): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(117): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(145): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(182): warning C4101: 'l1': unreferenced local variable
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(182): warning C4101: 'l2': unreferenced local variable
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\fluidsimulatorapp.cpp(103): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\grid.h(36): warning C4244: '=': conversion from 'int' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=float
+          ]
+  c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\grid.h(35): note: while compiling class template member function 'void Grid2D<float>::setIndex(int,int,int)'
+  c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(117): note: see reference to function template instantiation 'void Grid2D<float>::setIndex(int,int,int)' being compiled
+  c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(79): note: see reference to class template instantiation 'Grid2D<float>' being compiled
+  Circle.cpp
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\circle.cpp(13): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\circle.cpp(30): warning C4018: '<': signed/unsigned mismatch
+  Particle.cpp
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\particle.h(13): warning C4305: 'initializing': truncation from 'double' to 'float'
+  Test.cpp
+  TestClearColor.cpp
+  TestParticles.cpp
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\particle.h(13): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testparticles.cpp(21): warning C4018: '<': signed/unsigned mismatch
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testparticles.cpp(54): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testparticles.cpp(109): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  glm.cpp
+  imgui.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_impl_glfw_gl3.cpp
+LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
   Generating code
-  1 of 10 functions (10.0%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
+  2282 of 2282 functions (100.0%) were compiled.
+    2272 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  FluidSimulatorApp.vcxproj -> C:\Users\otman\OneDrive\Desktop\FluidSimulator\FluidSimulatorApp\x64\Release\FluidSimulatorApp.exe
+glew32s.lib(glew.obj) : warning LNK4099: PDB 'vc120.pdb' was not found with 'glew32s.lib(glew.obj)' or at 'C:\Users\Otman\Desktop\FluidSimulatorApp\x64\Release\vc120.pdb'; linking object as if no debug info
+  FluidSimulatorApp.vcxproj -> C:\Users\Otman\Desktop\FluidSimulatorApp\x64\Release\FluidSimulatorApp.exe

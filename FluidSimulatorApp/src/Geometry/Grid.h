@@ -23,9 +23,25 @@ struct Grid2D
 	/*
 	Gets value at 2d index
 	*/
-	T index(int i, int j)
+	T getIndex(int i, int j)
 	{
 		return data[columns*i + j];
+	}
+
+	/*
+	Sets value at 2D index
+	*/
+	void setIndex(int i, int j, int value)
+	{
+		data[columns*i + j] = value;
+	}
+
+	/*
+	Increments value at index
+	*/
+	void incrementIndex(int i, int j, float increment)
+	{
+		data[columns*i + j] += increment;
 	}
 
 	/*

@@ -28,8 +28,8 @@ namespace test {
 			//Init canvas
 			canvas.proj = glm::ortho(0.0f, (float)*m_WindowWidthPtr, 0.0f, (float)*m_WindowHeightPtr, -1.0f, 1.0f);
 			canvas.view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-			canvas.labelGrid.rows = 10;
-			canvas.labelGrid.columns = 10;
+			canvas.labelGrid.rows = 31;
+			canvas.labelGrid.columns = 31;
 			canvas.wwidth = *m_WindowWidthPtr;
 			canvas.wheight = *m_WindowHeightPtr;
 			canvas.initCanvasLabels();
@@ -71,41 +71,143 @@ namespace test {
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		}
 
+		/*
+		Steps the system by timestep dt
+		*/
 		void step(float dt) override
 		{
 			vf.updateOpenGLData();
-			/*
-			int maxh = *m_WindowHeightPtr / 2;
-			int maxw = *m_WindowWidthPtr / 2;
-			for (auto& p : m_Particles) {
+			advectSLA(dt);
+			addBodyForces(dt);
+			vf.swapBuffers();
+		}
 
-				p.step(dt);
-				p.normalizeVelocity(m_Speed);
-				if (p.getPosition().x > maxw) {
-					p.setPosition(glm::vec2(-maxw, p.getPosition().y));
-				}
-				if (p.getPosition().x < -maxw) {
-					p.setPosition(glm::vec2(maxw, p.getPosition().y));
-				}
+		/*
+		Advects velocity field using semi lagrangian advection
+		*/
+		void advectSLA(float dt)
+		{
+			
+			Eigen::Vector2f currPos, prevPos, currVel;
+			float prevU, prevV;
 
-				if (p.getPosition().y > maxh) {
-					p.setPosition(glm::vec2(p.getPosition().x, -maxh));
-				}
-				if (p.getPosition().y < -maxh) {
-					p.setPosition(glm::vec2(p.getPosition().x, maxh));
-				}
+			//Loop through all u edges
+			for (int i = 0; i < vf.u.rows; i++)
+			{
+				for (int j = 0; j < vf.u.columns; j++)
+				{
+					//look at point in middle
+					currPos(0) = (float)j * vf.dx;
+					currPos(1) = (float)i * vf.dx + vf.dx / 2.0f;
+					
+					//get velocity at current position
+					currVel(0) = vf.u.getIndex(i, j);
+					currVel(1) = vf.getVelocityV(currPos);
 
+					//trace backwards in time
+					prevPos = currPos - dt * currVel;
 
-				if (m_Current == m_Period) {
-					m_Current = 0;
-					//set random acceleration
-					p.setRandomAcceleration(10);
+					//make sure prevPos is within bounds
+					projectPositionToWindow(prevPos);
+
+					//interpolate velocity then
+					prevU = vf.getVelocityU(prevPos);
+
+					//set backbuffer velocity to the one found. 
+					vf.u_backbuffer.setIndex(i, j, prevU);
+
 				}
 			}
 
-			m_Current += 1;
-			*/
+			//Loop through all v edges
+			for (int i = 0; i < vf.v.rows; i++)
+			{
+				for (int j = 0; j < vf.v.columns; j++)
+				{
+					//look at point in middle of edge
+					currPos(0) = (float) j * vf.dx + vf.dx / 2.0f;
+					currPos(1) = (float) i * vf.dx;
 
+					//get velocity at current position
+					currVel(0) = vf.getVelocityU(currPos);
+					currVel(1) = vf.v.getIndex(i, j);
+
+					//trace backwards in time
+					prevPos = currPos - dt * currVel;
+
+					//make sure prevPos is within bounds
+					projectPositionToWindow(prevPos);
+
+					//interpolate velocity then
+					prevV = vf.getVelocityV(prevPos);
+
+					//set backbuffer velocity to the one found. 
+					vf.v_backbuffer.setIndex(i, j, prevV);
+
+				}
+			}
+		}
+
+		
+		/*
+		Projects pos to be within window limitations.
+		*/
+		void projectPositionToWindow(Eigen::Vector2f& pos)
+		{
+			
+			float epsilon = 1.0f;
+			if (pos.x() < 0.0f) {
+				pos(0) = 0.0f + epsilon;
+			}
+			else if (pos.x() > *m_WindowHeightPtr)
+			{
+				pos(0) = *m_WindowHeightPtr - epsilon;
+			}
+			if (pos.y() < 0.0f)
+			{
+				pos(1) = 0.0f + epsilon;
+			}
+			if (pos.y() > *m_WindowWidthPtr)
+			{
+				pos(1) = *m_WindowWidthPtr - epsilon;
+			}
+			
+		}
+
+		/*
+		Loops through all edges, checks if it is at the boundary of liquid and something else. If so, updates backbuffer velocity.
+		*/
+		void addBodyForces(float dt)
+		{
+			Label l1, l2;
+			Eigen::Vector2f gravityForce(0.0f, -100.0f);
+			// Increment horizontal component (u component)
+			for (int i = 0; i < canvas.labelGrid.rows; i++)
+			{
+				for (int j = 1; j < canvas.labelGrid.columns ; j++)
+				{
+					Label l1 = static_cast<Label>(canvas.labelGrid.getIndex(i, j));
+					Label l2 = static_cast<Label>(canvas.labelGrid.getIndex(i, j-1));
+					if (l1 == Label::LIQUID || l2 == Label::LIQUID) //u component of velocity updated
+					{
+						vf.u_backbuffer.incrementIndex(i, j, dt * gravityForce.x());
+					}
+				}
+			}
+
+			for (int j = 0; j < canvas.labelGrid.columns; j++)
+			{
+				// Increment vertical component (v component)
+				for (int i = 1; i < canvas.labelGrid.rows; i++)
+				{
+					Label l1 = static_cast<Label>(canvas.labelGrid.getIndex(i, j));
+					Label l2 = static_cast<Label>(canvas.labelGrid.getIndex(i - 1, j));
+					if (l1 == Label::LIQUID || l2 == Label::LIQUID) //u component of velocity updated
+					{
+						vf.v_backbuffer.incrementIndex(i, j, dt * gravityForce.y());
+					}
+				}
+			}
 		}
 
 		void createRandomParticle(int& x, int& y)

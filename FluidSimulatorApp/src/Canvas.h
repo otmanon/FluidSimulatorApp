@@ -3,6 +3,9 @@
 #include "glm.hpp"
 #include "Grid.h"
 
+enum Label {
+	SOLID, AIR, LIQUID
+};
 /*
 Canvas used for displaying labels on screen
 */
@@ -63,17 +66,18 @@ struct Canvas2D : public Drawable
 		{
 			for (int j = 0; j < columns; j++)
 			{
-				if (i == 0 || i == rows - 1)
+				if (i == 0 || i == rows - 1 || j == 0 || j == columns - 1) // on border
 				{
-					labelGrid.data.push_back(1);
+					labelGrid.data.push_back(Label::SOLID);
 				}
-				else if (j == 0 || j == columns - 1)
+				else if (j < labelGrid.columns / 2 + labelGrid.columns / 4 && j > labelGrid.columns / 2 - labelGrid.columns / 4
+					&& i < labelGrid.rows / 2 + labelGrid.rows / 4 && i > labelGrid.rows/2 - labelGrid.columns/4)
 				{
-					labelGrid.data.push_back(1);
+					labelGrid.data.push_back(Label::LIQUID);
 				}
 				else
 				{
-					labelGrid.data.push_back(0);
+					labelGrid.data.push_back(Label::AIR);
 				}
 
 			}
