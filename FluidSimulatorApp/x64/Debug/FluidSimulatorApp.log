@@ -1,0 +1,14 @@
+﻿  FluidSimulatorApp.cpp
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\particle.h(13): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\canvas.h(116): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\canvas.h(117): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(33): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(40): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(170): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(196): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(33): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(34): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(41): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(42): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\fluidsimulatorapp.cpp(103): warning C4305: 'argument': truncation from 'double' to 'float'
+  FluidSimulatorApp.vcxproj -> C:\Users\Otman\Desktop\FluidSimulatorApp\x64\Debug\FluidSimulatorApp.exe
