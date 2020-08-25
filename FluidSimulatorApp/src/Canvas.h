@@ -33,6 +33,8 @@ struct Canvas2D : public Drawable
 	*/
 	Grid2D<unsigned int> labelGrid;
 
+	Grid2D<unsigned int> labelGrid_backbuffer;
+
 	/*
 	Cell width/Cell Height
 	*/
@@ -84,6 +86,7 @@ struct Canvas2D : public Drawable
 
 		}
 
+		labelGrid_backbuffer = labelGrid;
 
 
 
@@ -121,11 +124,19 @@ struct Canvas2D : public Drawable
 		m_sh->SetUniform1f("u_Columns", labelGrid.columns);
 	}
 
+	/*
+	Swaps buffers for labelgrid
+	*/
+	void swapBuffers()
+	{
+		labelGrid = labelGrid_backbuffer;
+	}
 	void render()
 	{
 		Canvas2D::bind();
 
 		glm::mat4 mvp = proj;
+		m_sh->SetUniform1uiv("u_LabelGrid", labelGrid.data);
 		m_sh->SetUniformMat4f("u_MVP", mvp);
 		m_sh->SetUniform1i("u_DrawEdges", drawEdges);
 		GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));

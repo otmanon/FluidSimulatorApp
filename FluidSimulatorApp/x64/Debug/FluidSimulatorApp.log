@@ -1,7 +1,7 @@
 ﻿  FluidSimulatorApp.cpp
 c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\particle.h(13): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\canvas.h(120): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\canvas.h(121): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\canvas.h(123): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\canvas.h(124): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
 c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(35): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
 c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(42): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
 c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(168): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
@@ -10,14 +10,14 @@ c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(
 c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(38): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
 c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(45): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
 c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(46): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(129): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(157): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(194): warning C4101: 'l1': unreferenced local variable
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(194): warning C4101: 'l2': unreferenced local variable
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(356): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(377): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(385): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(406): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(160): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(188): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(225): warning C4101: 'l1': unreferenced local variable
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(225): warning C4101: 'l2': unreferenced local variable
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(440): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(461): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(469): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(490): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
 c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\fluidsimulatorapp.cpp(103): warning C4305: 'argument': truncation from 'double' to 'float'
 c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\grid.h(80): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
   c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\grid.h(73): note: while compiling class template member function 'void Grid2D<float>::handleUnknownValues(void)'
@@ -29,5 +29,5 @@ c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\grid.h(3
               _Ty=float
           ]
   c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\grid.h(35): note: while compiling class template member function 'void Grid2D<float>::setIndex(int,int,int)'
-  c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(129): note: see reference to function template instantiation 'void Grid2D<float>::setIndex(int,int,int)' being compiled
+  c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(160): note: see reference to function template instantiation 'void Grid2D<float>::setIndex(int,int,int)' being compiled
   FluidSimulatorApp.vcxproj -> C:\Users\Otman\Desktop\FluidSimulatorApp\x64\Debug\FluidSimulatorApp.exe

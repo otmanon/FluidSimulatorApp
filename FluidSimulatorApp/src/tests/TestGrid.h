@@ -3,7 +3,6 @@
 
 #include "Test.h"
 #include "imgui.h"
-#include "Circle.h"
 #include "Particle.h"
 #include "Grid.h"
 #include <Eigen/Dense>
@@ -22,9 +21,10 @@ namespace test {
 	private:
 		Canvas2D canvas;
 		VelocityField2D vf;
-		float gravityForce[2] = { 0.0f, -100.0f };
+		float gravityForce[2] = { 0.0f, -500.0f };
 		bool run_sim = false;
 		bool step_sim = false;
+		std::vector<Particle> particles;
 	public:
 		TestGrid(unsigned int * heightPtr, unsigned int * widthPtr) : 
 			Test(heightPtr, widthPtr)
@@ -32,8 +32,8 @@ namespace test {
 			//Init canvas
 			canvas.proj = glm::ortho(0.0f, (float)*m_WindowWidthPtr, 0.0f, (float)*m_WindowHeightPtr, -1.0f, 1.0f);
 			canvas.view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-			canvas.labelGrid.rows = 15;
-			canvas.labelGrid.columns = 15;
+			canvas.labelGrid.rows = 9;
+			canvas.labelGrid.columns = 9;
 			canvas.wwidth = *m_WindowWidthPtr;
 			canvas.wheight = *m_WindowHeightPtr;
 			canvas.initCanvasLabels();
@@ -50,6 +50,8 @@ namespace test {
 			vf.v.rows = canvas.labelGrid.rows + 1;
 			vf.initVelocityField();
 			vf.initOpenGLData();
+
+			initParticles(4);
 		};
 
 		~TestGrid()
@@ -59,10 +61,38 @@ namespace test {
 
 		void render() override
 		{
+			
 			canvas.render();	
 			vf.render();
+			float particle_color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+			for (auto& p : particles)
+			{
+				p.render(canvas.proj, canvas.view, particle_color);
+			}
 		};
 
+		void initParticles(int numParticlesPerCell)
+		{
+			Grid2D<unsigned int>& lGrid = canvas.labelGrid;
+			float x, y;
+			float div = 1.0f / static_cast <float> (RAND_MAX);;
+			for (int i = 0; i < lGrid.rows; i++)
+			{
+				for (int j = 0; j < lGrid.columns; j++)
+				{
+					if (lGrid.getIndex(i, j) == Label::LIQUID)
+					{
+						for (int n = 0; n < numParticlesPerCell; n++)
+						{
+							x = j * vf.dx + static_cast<float>(rand())*div*vf.dx;
+							y = i * vf.dx + static_cast<float>(rand())*div*vf.dx;
+							Particle p(glm::vec2(x, y), 10.0f);
+							particles.push_back(p);
+						}
+					}
+				}
+			}
+		}
 
 		void onImGuiRender() override
 		{
@@ -86,11 +116,12 @@ namespace test {
 			if (run_sim || step_sim)
 			{
 				if (step_sim) step_sim = false;
+				//advectCellLabels(dt);
 				advectSLA(dt);
 				addBodyForces(dt);
-				//advectLabels(dt);
 				pressureSolve(dt);
 				vf.swapBuffers();
+				advectParticles(dt);
 			}
 		}
 
@@ -225,7 +256,60 @@ namespace test {
 		/*
 		Advects the cell labels
 		*/
+		void advectCellLabels(float dt)
+		{
+			Eigen::Vector2f currPos, prevPos, currVel;
+			Label currLabel, prevLabel;
+			GridCoordinates prevCoords;
+			//Count how many fluid cells exist
+			Grid2D<unsigned int>& lGrid = canvas.labelGrid;
+			for (int i = 0; i < lGrid.rows; i++)
+			{
+				for (int j = 0; j < lGrid.columns; j++)
+				{
+				
+					currLabel = static_cast<Label>(lGrid.getIndex(i, j));
+					
+					currPos(0) = j * vf.dx + vf.dx * 0.5f; //currPos is center of each cell
+					currPos(1) = i * vf.dx + vf.dx * 0.5f;
+					
+					currVel(0) = vf.u.getIndex(i, j) + vf.u.getIndex(i, j + 1); //velocity at grid center
+					currVel(1) = vf.v.getIndex(i, j) + vf.v.getIndex(i + 1, j);
+					currVel *= 0.5f;
 
+					prevPos = currPos - dt * currVel;
+
+					prevCoords.i = (int)(prevPos.y() / vf.dx);
+					prevCoords.j = (int)(prevPos.x() / vf.dx);
+
+					prevLabel = static_cast<Label>(canvas.labelGrid.getIndex(prevCoords.i, prevCoords.j));
+
+					canvas.labelGrid_backbuffer.setIndex(i, j, static_cast<unsigned int>(prevLabel));
+
+					
+				}
+			}
+			canvas.swapBuffers();
+		}
+
+		/*
+		Moves all particles in the scene by their 
+		*/
+		void advectParticles(float dt)
+		{
+			Eigen::Vector2f currPos, nextPos, vel;
+			for (auto& p : particles)
+			{
+				currPos(0) = p.getPosition().x;
+				currPos(1) = p.getPosition().y;
+
+				vel = vf.getVelocity(currPos);
+
+				nextPos = currPos + dt * vel;
+
+				p.setPosition(glm::vec2(nextPos.x(), nextPos.y()));
+			}
+		}
 
 		/*
 		Solves pressure to ensure velocity field is divergence free
@@ -420,7 +504,7 @@ namespace test {
 		float divergenceAtCell(int i, int j, float dxinv)
 		{
 			float div_x = vf.u_backbuffer.getIndex(i, j + 1) - vf.u_backbuffer.getIndex(i, j);
-			float div_y = vf.v_backbuffer.getIndex(i + 1, j) - vf.u_backbuffer.getIndex(i, j);
+			float div_y = vf.v_backbuffer.getIndex(i + 1, j) - vf.v_backbuffer.getIndex(i, j);
 			return (div_x + div_y)*dxinv;
 		}
 		void createRandomParticle(int& x, int& y)
