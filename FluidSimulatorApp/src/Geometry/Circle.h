@@ -33,13 +33,6 @@ public:
 	
 	void buildIndices();
 
-	
-	/*
-		Builds Vertex Array, Vertex Buffer, Index BUffer and the 2 Shaders. 
-	*/
-	void buildGLObjects(); 
-
-	
 	void render(glm::mat4& proj, glm::mat4& view) const; 
 	void render(glm::mat4& proj, glm::mat4& view, float color[4]) const;
 

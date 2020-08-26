@@ -56,9 +56,9 @@ struct Canvas2D : public Drawable
 	bool drawEdges = true;
 
 	/*
-	Initializes cell labels.
+	Initializes cell labels, so that liquid is at center of grid, with walls surrounding border
 	*/
-	void initCanvasLabels()
+	void initCanvasLabelsCentered()
 	{
 		int rows = labelGrid.rows;
 		int columns = labelGrid.columns;
@@ -81,17 +81,74 @@ struct Canvas2D : public Drawable
 				{
 					labelGrid.data.push_back(Label::AIR);
 				}
-
 			}
-
 		}
-
 		labelGrid_backbuffer = labelGrid;
-
-
-
-
 	}
+
+	/*
+	Initializes cell labels so that liquid is at bottom left corner of grid
+	*/
+	void initCanvasLabelsCornered()
+	{
+		int rows = labelGrid.rows;
+		int columns = labelGrid.columns;
+		dx = wwidth / rows;
+		//fill label grid
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < columns; j++)
+			{
+				if (i == 0 || i == rows - 1 || j == 0 || j == columns - 1) // on border
+				{
+					labelGrid.data.push_back(Label::SOLID);
+				}
+				else if (j < labelGrid.columns / 2 && j >= 1
+					&& i < labelGrid.rows / 2  && i >= 1)
+				{
+					labelGrid.data.push_back(Label::LIQUID);
+				}
+				else
+				{
+					labelGrid.data.push_back(Label::AIR);
+				}
+			}
+		}
+		labelGrid_backbuffer = labelGrid;
+	}
+
+
+	/*
+	Initializes cell labels so that liquid is at bottom middle part of grid
+	*/
+	void initCanvasLabelsBottomed()
+	{
+		int rows = labelGrid.rows;
+		int columns = labelGrid.columns;
+		dx = wwidth / rows;
+		//fill label grid
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < columns; j++)
+			{
+				if (i == 0 || i == rows - 1 || j == 0 || j == columns - 1) // on border
+				{
+					labelGrid.data.push_back(Label::SOLID);
+				}
+				else if (j < labelGrid.columns / 2 + labelGrid.columns / 4 &&  j > labelGrid.columns / 2 - labelGrid.columns/4 
+					&& i < labelGrid.rows / 2  && i >= 1)
+				{
+					labelGrid.data.push_back(Label::LIQUID);
+				}
+				else
+				{
+					labelGrid.data.push_back(Label::AIR);
+				}
+			}
+		}
+		labelGrid_backbuffer = labelGrid;
+	}
+
 
 	/*
 	prepares the openGL	objects studd
@@ -124,6 +181,15 @@ struct Canvas2D : public Drawable
 		m_sh->SetUniform1f("u_Columns", labelGrid.columns);
 	}
 
+	/*
+	Clears canvas data
+	*/
+	void clear()
+	{
+		labelGrid.data.clear();
+		labelGrid.rows = 0;
+		labelGrid.columns = 0;
+	}
 	/*
 	Swaps buffers for labelgrid
 	*/

@@ -21,23 +21,60 @@ namespace test {
 	private:
 		Canvas2D canvas;
 		VelocityField2D vf;
-		float gravityForce[2] = { 0.0f, -500.0f };
+		float gravityForce[2] = { 0.0f, -100.0f };
 		bool run_sim = false;
 		bool step_sim = false;
 		std::vector<Particle> particles;
+
+		bool centered = false;
+		bool cornered = true;
+		bool bottomed = false;
+
+		bool drawParticles = false;
+
+		bool classifyCells = true;
+		bool particleAdvection = false;
+		bool semiLAdvection = true;
+		bool bodyForces = true;
+		bool pressureProjection = true;
+
 	public:
 		TestGrid(unsigned int * heightPtr, unsigned int * widthPtr) : 
 			Test(heightPtr, widthPtr)
 		{
 			//Init canvas
+			setUpGrid(true);
+			
+		};
+
+		/*
+		Sets up grid including the canvas grid that contains cell labels, as well as the velocity field grids
+		*/
+		void setUpGrid(bool setUPOpenGLObjects)
+		{
 			canvas.proj = glm::ortho(0.0f, (float)*m_WindowWidthPtr, 0.0f, (float)*m_WindowHeightPtr, -1.0f, 1.0f);
 			canvas.view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-			canvas.labelGrid.rows = 9;
-			canvas.labelGrid.columns = 9;
+			canvas.labelGrid.rows = 31;
+			canvas.labelGrid.columns = 31;
 			canvas.wwidth = *m_WindowWidthPtr;
 			canvas.wheight = *m_WindowHeightPtr;
-			canvas.initCanvasLabels();
-			canvas.initOpenGLData();
+			if (centered)
+			{
+				canvas.initCanvasLabelsCentered();
+				centered = false;
+			}
+			else if (cornered)
+			{
+				canvas.initCanvasLabelsCornered();
+				cornered = false;
+			}
+			else if (bottomed)
+			{
+				canvas.initCanvasLabelsBottomed();
+				bottomed = false;
+			}
+			if (setUPOpenGLObjects)
+				canvas.initOpenGLData();
 
 			//Init velocityfield
 			vf.proj = canvas.proj;
@@ -49,15 +86,22 @@ namespace test {
 			vf.v.columns = canvas.labelGrid.columns;
 			vf.v.rows = canvas.labelGrid.rows + 1;
 			vf.initVelocityField();
-			vf.initOpenGLData();
+
+			if (setUPOpenGLObjects)
+				vf.initOpenGLData();
 
 			initParticles(4);
-		};
-
-		~TestGrid()
-		{
+		}
 		
-		};
+		/*
+		Clears all grid values
+		*/
+		void clear()
+		{
+			particles.clear();
+			canvas.clear();
+			vf.clear();
+		}
 
 		void render() override
 		{
@@ -65,9 +109,12 @@ namespace test {
 			canvas.render();	
 			vf.render();
 			float particle_color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-			for (auto& p : particles)
+			if (drawParticles)
 			{
-				p.render(canvas.proj, canvas.view, particle_color);
+				for (auto& p : particles)
+				{
+					p.render(canvas.proj, canvas.view, particle_color);
+				}
 			}
 		};
 
@@ -97,9 +144,18 @@ namespace test {
 		void onImGuiRender() override
 		{
 			//	ImGui::SliderFloat2("Translation B", &m_TranslationB.x, -max_dim / 2, max_dim/2);
+			ImGui::Checkbox("Centered", &centered); ImGui::Checkbox("Cornered", &cornered); ImGui::Checkbox("Bottomed", &bottomed);
 			ImGui::Checkbox("Run", &run_sim); ImGui::SameLine();
 			ImGui::Checkbox("Step", &step_sim);
+			ImGui::Text("Simulation Components");
+			ImGui::Checkbox("SemiLagrangian Adv", &semiLAdvection);
+			ImGui::Checkbox("Pressure Solve", &pressureProjection);
+			ImGui::Checkbox("Add Body Forces", &bodyForces);
+			ImGui::Checkbox("Advect Particles", &particleAdvection);
+			ImGui::Checkbox("Classify Cells", &classifyCells);
+	
 			ImGui::SliderFloat("Vis Scale", &vf.vis_scale, 0.01f, 10.0f);
+			ImGui::Checkbox("Draw Particles", &drawParticles);
 			ImGui::Checkbox("Draw Grid Edges", &canvas.drawEdges);
 			ImGui::Checkbox("Draw Vel Field Edge", &vf.drawFieldEdgeWise);
 			ImGui::Checkbox("Draw Vel Field Center", &vf.centeredVF.drawFieldCenterWise);
@@ -113,15 +169,28 @@ namespace test {
 		void step(float dt) override
 		{
 			vf.updateOpenGLData();
+			if (cornered || centered || bottomed)
+			{
+				clear();
+				setUpGrid(false);
+			}
 			if (run_sim || step_sim)
 			{
 				if (step_sim) step_sim = false;
 				//advectCellLabels(dt);
-				advectSLA(dt);
-				addBodyForces(dt);
-				pressureSolve(dt);
+				if (semiLAdvection)
+					advectSLA(dt);
+				if (bodyForces)
+					addBodyForces(dt);
+				if (pressureProjection)
+					pressureSolve(dt);
+			
 				vf.swapBuffers();
-				advectParticles(dt);
+
+				if (particleAdvection)
+					advectParticles(dt);
+				if (classifyCells)
+					reclassifyCells();
 			}
 		}
 
@@ -218,6 +287,38 @@ namespace test {
 		}
 
 		/*
+		Classifies cells by looping through particles, getting which cell they belong to, and switching that to a liquid cell
+		*/
+		void reclassifyCells()
+		{
+			Eigen::Vector2f pos;
+			GridCoordinates pCoords; 
+
+			// First clear all cells that aren't solids and set them to air
+			for (int i = 0; i < canvas.labelGrid.rows; i++)
+			{
+				for (int j = 0; j < canvas.labelGrid.columns; j++)
+				{
+					if (canvas.labelGrid.getIndex(i, j) != Label::SOLID)
+					{
+						canvas.labelGrid.setIndex(i, j, Label::AIR);
+					}
+				}
+			}
+			for (auto& p : particles)
+			{
+				pos(0) = p.getPosition().x;
+				pos(1) = p.getPosition().y;
+
+				pCoords.i = (int)(pos.y() / vf.dx);
+				pCoords.j = (int)(pos.x() / vf.dx);
+
+				canvas.labelGrid.setIndex(pCoords.i, pCoords.j, Label::LIQUID);
+
+			}
+		}
+
+		/*
 		Loops through all edges, checks if it is at the boundary of liquid and something else. If so, updates backbuffer velocity.
 		*/
 		void addBodyForces(float dt)
@@ -293,7 +394,7 @@ namespace test {
 		}
 
 		/*
-		Moves all particles in the scene by their 
+		Moves all particles in the scene by their interpolated velocity
 		*/
 		void advectParticles(float dt)
 		{
@@ -316,7 +417,7 @@ namespace test {
 		*/
 		void pressureSolve(float dt)
 		{
-			//Count how many fluid cells exist
+			//Count how many fluid cells exist. Also give all fluid cells a cell index
 			Grid2D<unsigned int>& lGrid = canvas.labelGrid;
 			int numFluidCells = 0;
 			Grid2D<int> iGrid;//will hold -1 if cell is not a liquid, otherwise will hold liquid index
@@ -340,7 +441,7 @@ namespace test {
 
 			//Set up b vector, which will hold current divergence of v field
 			Eigen::VectorXf b(numFluidCells);
-
+			
 			float negDivergence = 0;
 			float dxinv = 1 / vf.dx;
 
@@ -353,7 +454,24 @@ namespace test {
 					if (lGrid.getIndex(i, j) == Label::LIQUID)
 					{
 						//calculate divergence
-						negDivergence = -divergenceAtCell(i, j, dxinv);
+						negDivergence = divergenceAtCell(i, j, dxinv);
+						
+						if (lGrid.getIndex(i - 1, j) == Label::SOLID)
+						{
+							negDivergence -= dxinv * vf.v_backbuffer.getIndex(i, j);
+						}
+						if (lGrid.getIndex(i + 1, j) == Label::SOLID)
+						{
+							negDivergence += dxinv * vf.v_backbuffer.getIndex(i + 1, j);
+						}
+						if (lGrid.getIndex(i, j - 1) == Label::SOLID)
+						{
+							negDivergence -= dxinv * vf.u_backbuffer.getIndex(i, j);
+						}
+						if (lGrid.getIndex(i, j + 1) == Label::SOLID)
+						{
+							negDivergence += dxinv * vf.u_backbuffer.getIndex(i, j + 1);
+						}
 						b(index) = negDivergence;
 						index++;
 					}
@@ -363,7 +481,7 @@ namespace test {
 
 			index = 0;
 			Eigen::SparseMatrix<float> A(numFluidCells, numFluidCells);
-			float scale =  dxinv*dxinv;// assuming density of 1
+			float scale =  dt*dxinv*dxinv;// assuming density of 1
 			int numNonSolidNeighbors = 0;
 			Label l1, l2, l3, l4;
 			for (int i = 0; i < lGrid.rows; i++)

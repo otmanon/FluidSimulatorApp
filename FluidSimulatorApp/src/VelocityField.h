@@ -400,6 +400,30 @@ public:
 		v = v_backbuffer;
 		v.handleUnknownValues();
 	}
+
+	/*
+	Clears velocity field data
+	*/
+	void clear()
+	{
+		u.data.clear();
+		u.rows = 0;
+		u.columns = 0;
+		
+		v.data.clear();
+		v.rows = 0;
+		v.columns = 0;
+
+		u_backbuffer.data.clear();
+		u_backbuffer.rows = 0;
+		u_backbuffer.columns = 0;
+
+		v_backbuffer.data.clear();
+		v_backbuffer.rows = 0;
+		v_backbuffer.columns = 0;
+
+	}
+
 	/*
 	Renders velocity field
 	*/

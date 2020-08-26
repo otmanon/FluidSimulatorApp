@@ -1,37 +1,40 @@
 ﻿  FluidSimulatorApp.cpp
 c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\particle.h(13): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\canvas.h(120): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\canvas.h(121): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\canvas.h(180): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\canvas.h(181): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
 c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(35): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
 c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(42): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
 c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(168): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
 c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(185): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(35): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(36): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(43): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(44): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(122): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(150): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(187): warning C4101: 'l1': unreferenced local variable
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(187): warning C4101: 'l2': unreferenced local variable
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(347): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(356): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(364): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(373): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(50): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(51): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(72): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(73): warning C4244: '=': conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(201): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(229): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(298): warning C4101: 'l1': unreferenced local variable
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(298): warning C4101: 'l2': unreferenced local variable
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(530): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(551): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(559): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(580): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
 c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\fluidsimulatorapp.cpp(103): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\grid.h(80): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\grid.h(73): note: while compiling class template member function 'void Grid2D<float>::handleUnknownValues(void)'
+  c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(399): note: see reference to function template instantiation 'void Grid2D<float>::handleUnknownValues(void)' being compiled
+  c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(79): note: see reference to class template instantiation 'Grid2D<float>' being compiled
 c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\grid.h(36): warning C4244: '=': conversion from 'int' to '_Ty', possible loss of data
           with
           [
               _Ty=float
           ]
   c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\geometry\grid.h(35): note: while compiling class template member function 'void Grid2D<float>::setIndex(int,int,int)'
-  c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(122): note: see reference to function template instantiation 'void Grid2D<float>::setIndex(int,int,int)' being compiled
-  c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\velocityfield.h(79): note: see reference to class template instantiation 'Grid2D<float>' being compiled
+  c:\users\otman\desktop\fluidsimulatorapp\fluidsimulatorapp\src\tests\testgrid.h(201): note: see reference to function template instantiation 'void Grid2D<float>::setIndex(int,int,int)' being compiled
 LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
   Generating code
-  2 of 3307 functions (<0.1%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    4 functions had inline decision re-evaluated but remain unchanged
+  19 of 3335 functions ( 0.6%) were compiled, the rest were copied from previous compilation.
+    7 functions were new in current compilation
+    35 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
 glew32s.lib(glew.obj) : warning LNK4099: PDB 'vc120.pdb' was not found with 'glew32s.lib(glew.obj)' or at 'C:\Users\Otman\Desktop\FluidSimulatorApp\x64\Release\vc120.pdb'; linking object as if no debug info
   FluidSimulatorApp.vcxproj -> C:\Users\Otman\Desktop\FluidSimulatorApp\x64\Release\FluidSimulatorApp.exe
