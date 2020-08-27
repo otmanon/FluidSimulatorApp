@@ -14,7 +14,11 @@ protected:
 
 public:
 	Particle(glm::vec2 position, float radius);
-	~Particle() {}
+	~Particle() {
+		m_vb->Unbind();
+		m_va->Unbind();
+		m_ib->Unbind();
+	}
 	void DestroyParticle();
 
 	virtual void step(float dt);
@@ -32,5 +36,12 @@ public:
 
 
 	Eigen::Vector2f getVelocity() { return Eigen::Vector2f(m_Velocity.x, m_Velocity.y); }
+
+	void incrementVelocity(Eigen::Vector2f incV)
+	{
+		m_Velocity.x += incV.x();
+
+		m_Velocity.y += incV.y();
+	}
 	
 };

@@ -31,7 +31,7 @@ struct Grid2D
 	/*
 	Sets value at 2D index
 	*/
-	void setIndex(int i, int j, int value)
+	void setIndex(int i, int j, T value)
 	{
 		data[columns*i + j] = value;
 	}
@@ -39,7 +39,7 @@ struct Grid2D
 	/*
 	Increments value at index
 	*/
-	void incrementIndex(int i, int j, float increment)
+	void incrementIndex(int i, int j, T increment)
 	{
 		data[columns*i + j] += increment;
 	}
@@ -66,6 +66,19 @@ struct Grid2D
 		return coords;
 	}
 
+	/*
+	Set value of all elements in data to zero
+	*/
+	void zero()
+	{
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < columns; j++)
+			{
+				setIndex(i, j, 0.0f);
+			}
+		}
+	}
 	/*
 	Goes through 2D array, checks if value is maximum allowed of type, if it is, set it to zero
 	*/

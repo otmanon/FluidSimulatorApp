@@ -28,7 +28,7 @@ uniform float u_Rows; //number of rows
 uniform float u_Columns; //number of columnns
 
 uniform bool u_DrawEdges;
-
+uniform bool u_DrawFluidCells;
 unsigned int indexLabelGrid(float i, float j)
 {
 	return  u_LabelGrid[int(i*u_Columns+ j)];
@@ -58,9 +58,16 @@ void main()
 	{ //air
 		color = vec4(0.5f, 0.5f, 0.9f, 1.0f);
 	}
-	else if (label == uint(2))
+	else if (label == uint(2) )
 	{
-		color = vec4(0.31f, 0.23f, 0.62f, 1.0f); //liquid
+		if ( u_DrawFluidCells)
+		{
+			color = vec4(0.31f, 0.23f, 0.62f, 1.0f); //liquid
+		}
+		else
+		{
+			color = vec4(0.5f, 0.5f, 0.9f, 1.0f); //same color as air
+		}
 	}
 
 	if (u_DrawEdges)

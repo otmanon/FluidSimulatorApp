@@ -55,6 +55,12 @@ struct Canvas2D : public Drawable
 	*/
 	bool drawEdges = true;
 
+
+	/*
+	Draw Fluid Cells
+	*/
+	bool drawFluidCells = false;
+
 	/*
 	Initializes cell labels, so that liquid is at center of grid, with walls surrounding border
 	*/
@@ -179,6 +185,7 @@ struct Canvas2D : public Drawable
 		m_sh->SetUniform1f("u_dx", dx);
 		m_sh->SetUniform1f("u_Rows", labelGrid.rows);
 		m_sh->SetUniform1f("u_Columns", labelGrid.columns);
+		m_sh->SetUniform1i("u_DrawFluidCells", drawFluidCells);
 	}
 
 	/*
@@ -205,6 +212,7 @@ struct Canvas2D : public Drawable
 		m_sh->SetUniform1uiv("u_LabelGrid", labelGrid.data);
 		m_sh->SetUniformMat4f("u_MVP", mvp);
 		m_sh->SetUniform1i("u_DrawEdges", drawEdges);
+		m_sh->SetUniform1i("u_DrawFluidCells", drawFluidCells);
 		GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 	}
 };

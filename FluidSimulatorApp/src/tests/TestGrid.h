@@ -30,7 +30,7 @@ namespace test {
 		bool cornered = true;
 		bool bottomed = false;
 
-		bool drawParticles = false;
+		bool drawParticles = true;
 
 		//step methods
 		bool classifyCells = true;
@@ -39,11 +39,12 @@ namespace test {
 		bool bodyForces = true;
 		bool pressureProjection = true;
 		bool extrapolateVelocityField = true;
+		bool particleToGridTransfer = true;
 
 		//type of advection
-		bool semiLAdvection = true;
+		bool semiLAdvection = false;
 		bool PICAdvection = false;
-		bool FLIPAdvection = false;
+		bool FLIPAdvection = true;
 		bool PICFLIPAdvection =false ;
 
 		float dt; //timestep
@@ -111,7 +112,7 @@ namespace test {
 
 			initParticles(4);
 			dt = 0.05f;
-			stepsPerFrame = (int)fps * dt;
+			stepsPerFrame = (int)(fps * dt);
 		}
 		
 		/*
@@ -182,6 +183,9 @@ namespace test {
 
 				ImGui::Text("Reset Simulation Starting Scene :");
 				ImGui::Checkbox("Centered", &centered); ImGui::SameLine(); ImGui::Checkbox("Cornered", &cornered); ImGui::SameLine(); ImGui::Checkbox("Bottomed", &bottomed);
+
+				ImGui::Text("Advection Method :");
+				ImGui::Checkbox("SemiLA", &semiLAdvection); ImGui::SameLine(); ImGui::Checkbox("PIC", &PICAdvection); ImGui::SameLine(); ImGui::Checkbox("FLIP", &FLIPAdvection);
 				
 				ImGui::SliderFloat2("Gravity",  gravityForce, -1000, 1000);
 			}
@@ -191,16 +195,17 @@ namespace test {
 			{
 				ImGui::SliderFloat("Vis Scale", &vf.vis_scale, 0.01f, 10.0f);
 				ImGui::Checkbox("Draw Particles", &drawParticles);
+				ImGui::Checkbox("Draw Fluid Cells", &canvas.drawFluidCells);
 				ImGui::Checkbox("Draw Grid Edges", &canvas.drawEdges);
 				ImGui::Checkbox("Draw Vel Field Edge", &vf.drawFieldEdgeWise);
 				ImGui::Checkbox("Draw Vel Field Center", &vf.centeredVF.drawFieldCenterWise);
 			}
 			
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			
 
 			if (ImGui::CollapsingHeader("Semi-LA"))
 			{
-				ImGui::Checkbox("SemiLagrangian Adv", &semiLAdvection);
+				ImGui::Checkbox("Adv Velocity Field SLA", &advectVelocitySLA);
 				ImGui::Checkbox("Pressure Solve", &pressureProjection);
 				ImGui::Checkbox("Add Body Forces", &bodyForces);
 				ImGui::Checkbox("Advect Particles", &particleAdvection);
@@ -208,12 +213,22 @@ namespace test {
 			}
 			if (ImGui::CollapsingHeader("PIC"))
 			{
-
+				ImGui::Checkbox("Particle To Grid Transfer", &particleToGridTransfer);
+				ImGui::Checkbox("Pressure Solve", &pressureProjection);
+				ImGui::Checkbox("Add Body Forces", &bodyForces);
+				ImGui::Checkbox("Advect Particles", &particleAdvection);
+				ImGui::Checkbox("Classify Cells", &classifyCells);
 			}
 			if (ImGui::CollapsingHeader("FLIP"))
 			{
-
+				ImGui::Checkbox("Particle To Grid Transfer", &particleToGridTransfer);
+				ImGui::Checkbox("Pressure Solve", &pressureProjection);
+				ImGui::Checkbox("Add Body Forces", &bodyForces);
+				ImGui::Checkbox("Advect Particles", &particleAdvection);
+				ImGui::Checkbox("Classify Cells", &classifyCells);
 			}
+
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		}
 
 		/*
@@ -249,11 +264,11 @@ namespace test {
 				}
 				else if (PICAdvection)
 				{
-
+					stepPIC(dt);
 				}
 				else if (FLIPAdvection)
 				{
-
+					stepFLIP(dt);
 				}
 				else if (PICFLIPAdvection)
 				{
@@ -264,13 +279,15 @@ namespace test {
 			currStepCounter++;
 		}
 
+
 		/*
 		Steps the system using the semi lagrangian method with marker particles
 		*/
 		void stepSLA(float dt)
 		{
 			
-			//advectCellLabels(dt);
+			if (classifyCells)
+				reclassifyCells();
 			if (semiLAdvection)
 				advectVelocitySemiLA(dt);
 			if (bodyForces)
@@ -281,9 +298,8 @@ namespace test {
 			vf.swapBuffers();
 
 			if (particleAdvection)
-				advectParticles(dt);
-			if (classifyCells)
-				reclassifyCells();
+				advectParticlesFLIP(dt);
+
 		}
 
 		/*
@@ -291,8 +307,48 @@ namespace test {
 		*/
 		void stepPIC(float dt)
 		{
+			if (classifyCells)
+				reclassifyCells();
 			//transfer Particle Velocity To Grid
-			transferParticleVelocityToGrid();
+			if (particleToGridTransfer)
+				transferParticleVelocityToGrid();
+			if (bodyForces)
+				addBodyForces(dt);
+			if (pressureProjection)
+				pressureSolve(dt);
+
+			vf.swapBuffers();
+
+			if (particleAdvection)
+				advectParticlesDirectly(dt);
+		}
+
+		/*
+		Steps system using FLIP with marker particles
+		*/
+		void stepFLIP(float dt)
+		{
+			if (classifyCells)
+				reclassifyCells();
+			//transfer Particle Velocity To Grid
+			if (particleToGridTransfer)
+				transferParticleVelocityToGrid();
+
+			vf.saveFLIPGrids();
+
+			if (bodyForces)
+				addBodyForces(dt);
+			if (pressureProjection)
+				pressureSolve(dt);
+
+			vf.swapBuffers();
+
+			vf.calculateFLIPDiffGrids();
+
+			if (particleAdvection)
+				advectParticlesFLIP(dt);
+
+			deleteParticlesInSolids(); //sometimes particles cross over toa solid wakk
 		}
 
 		/*
@@ -300,9 +356,12 @@ namespace test {
 		*/
 		void transferParticleVelocityToGrid()
 		{
-			float distanceX, distanceY, distance;
-			Eigen::Vector2f pPos, displacement, edgePos, vel;
-			float r, h;
+			float distanceX, distanceY;
+			Eigen::Vector2f pPos, distance, edgePos, vel;
+			float r_x, r_y, h_x, h_y, k;
+	
+			vf.zero();
+
 			for (auto& p : particles)
 			{
 				pPos(0) = p.getPosition().x;
@@ -314,18 +373,45 @@ namespace test {
 				{
 					for (int j = 0; j < vf.u.columns; j++)
 					{
+					
 						edgePos(0) = j * vf.dx;
 						edgePos(1) = i * vf.dx + 0.5f * vf.dx;
-						displacement = edgePos - pPos;
-						distance = (edgePos - pPos).norm();
-						
-						r = distance / vf.dx;
+						distance = (edgePos - pPos).cwiseAbs();
+			
+						r_x = distance.x() / vf.dx;
+						r_y = distance.y() / vf.dx;
 
+						h_x = r_x < 1.0f ? 1 - r_x : 0;
+						h_y = r_y < 1.0f ? 1 - r_y : 0;
+						k = h_x * h_y;
+						vf.uWeight.incrementIndex(i, j, k);
+						vf.u.incrementIndex(i, j, vel.x() * k);
 
 					}
 				}
+
 				//go through v edges and disburse particle v velocity to those
+				for (int i = 0; i < vf.v.rows; i++)
+				{
+					for (int j = 0; j < vf.v.columns; j++)
+					{
+						edgePos(0) = j * vf.dx + 0.5f * vf.dx;
+						edgePos(1) = i * vf.dx;
+						distance = (edgePos - pPos).cwiseAbs();
+
+						r_x = distance.x() / vf.dx;
+						r_y = distance.y() / vf.dx;
+
+						h_x = r_x < 1.0f ? 1 - r_x : 0;
+						h_y = r_y < 1.0f ? 1 - r_y : 0;
+						k = h_x * h_y;
+						vf.vWeight.incrementIndex(i, j, k);
+						vf.v.incrementIndex(i, j, vel.y() * k);
+
+					}
+				}
 			}
+			vf.divideVelByKernelWeights();
 		}
 
 		/*
@@ -444,10 +530,15 @@ namespace test {
 				pos(0) = p.getPosition().x;
 				pos(1) = p.getPosition().y;
 
+				projectPositionToWindow(pos);
 				pCoords.i = (int)(pos.y() / vf.dx);
 				pCoords.j = (int)(pos.x() / vf.dx);
 
-				canvas.labelGrid.setIndex(pCoords.i, pCoords.j, Label::LIQUID);
+				
+				if (canvas.labelGrid.getIndex(pCoords.i, pCoords.j) != SOLID)
+				{
+					canvas.labelGrid.setIndex(pCoords.i, pCoords.j, Label::LIQUID);
+				}
 
 			}
 		}
@@ -528,9 +619,9 @@ namespace test {
 		}
 
 		/*
-		Moves all particles in the scene by their interpolated velocity
+		Moves all particles in the scene by their interpolated velocity from the grid
 		*/
-		void advectParticles(float dt)
+		void advectParticlesDirectly(float dt)
 		{
 			Eigen::Vector2f currPos, nextPos, vel;
 			for (auto& p : particles)
@@ -540,9 +631,37 @@ namespace test {
 
 				vel = vf.getVelocity(currPos);
 
+				p.setVelocity(glm::vec2(vel.x(), vel.y()));
+
 				nextPos = currPos + dt * vel;
 
 				p.setPosition(glm::vec2(nextPos.x(), nextPos.y()));
+			}
+		}
+
+		/*
+	Moves all particles in the scene by their new velocity, this time
+	not taken from directly interpolating the grid, but instead, by updating them with the incremental calculation stored in 
+	vf.uDiffGrid and vf.vDiffGrid
+	*/
+		void advectParticlesFLIP(float dt)
+		{
+			Eigen::Vector2f currPos, nextPos, vel_inc;
+			for (auto& p : particles)
+			{
+				currPos(0) = p.getPosition().x;
+				currPos(1) = p.getPosition().y;
+
+				projectPositionToWindow(currPos);
+				vel_inc = vf.getIncrementalVelocity(currPos);
+
+				p.incrementVelocity(vel_inc);
+
+				nextPos = currPos + dt * p.getVelocity();
+
+				p.setPosition(glm::vec2(nextPos.x(), nextPos.y()));
+
+				
 			}
 		}
 
@@ -669,8 +788,6 @@ namespace test {
 				}
 			}
 
-			Eigen::MatrixXf A_d;
-			A_d = Eigen::MatrixXf(A);
 			Eigen::ConjugateGradient<Eigen::SparseMatrix<float>> solver;
 			solver.setMaxIterations(100);
 			solver.compute(A);
@@ -767,6 +884,35 @@ namespace test {
 
 		};
 
+
+		/*
+		Deletes particles found within a solid
+		*/
+		void deleteParticlesInSolids()
+		{
+			std::vector<int> deleteQueue; //indices of particles to be deleted
+			GridCoordinates coords;
+			int i = 0;
+			for (auto& p : particles)
+			{
+				coords.i = (int)(p.getPosition().y / vf.dx);
+				coords.j = (int)(p.getPosition().x / vf.dx);
+
+				if (canvas.labelGrid.getIndex(coords.i, coords.j) == Label::SOLID)
+				{
+					deleteQueue.push_back(i);
+				}
+				i++;
+			}
+
+			int num_deleted = 0;
+			for (auto& ind : deleteQueue)
+			{
+				particles[i].~Particle();
+				particles.erase(particles.begin() + ind - num_deleted);
+				num_deleted++;
+			}
+		}
 		/*
 		On Mouse click we will create particles in cells surrounding mouse, if the cells are solid
 		*/

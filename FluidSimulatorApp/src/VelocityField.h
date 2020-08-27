@@ -26,7 +26,8 @@ struct CenteredVelocityDisplay2D : public Drawable
 	/*
 	Whether or not to draw field centerwise
 	*/
-	bool drawFieldCenterWise = true;
+	bool drawFieldCenterWise = false;
+
 public:
 
 	void initOpenGLData()
@@ -83,6 +84,36 @@ public:
 	*/
 	Grid2D<float> v;
 	Grid2D<float> v_backbuffer;
+
+	/*
+	u Component Weight Grid used for transferring particles to grid
+	*/
+	Grid2D<float> uWeight;
+	/*
+	v Component Weight Grid used for transferring particles to grid
+	*/
+	Grid2D<float> vWeight;
+
+	/*
+	temporary stored U Grid used for FLIP
+	*/
+	Grid2D<float> uTempFLIPGrid;
+
+	/*
+	temporary stored v grid usef for flip
+	*/
+	Grid2D<float> vTempFLIPGrid;
+
+	/*
+	stores  incremental u udpate between start of timestep and end, for FLIP
+	*/
+	Grid2D<float> uDiffFLIPGrid;
+
+	/*
+	stores  incremental v udpate between start of timestep and end, for FLIP
+	*/
+	Grid2D<float> vDiffFLIPGrid;
+
 	/*
 	Cell width/Cell Height
 	*/
@@ -106,7 +137,7 @@ public:
 	/*
 	Draw velocity field from edges
 	*/
-	bool drawFieldEdgeWise= true;
+	bool drawFieldEdgeWise= false;
 
 	
 
@@ -131,6 +162,8 @@ public:
 			}
 		}
 		u_backbuffer = u;
+		uWeight = u;
+		uDiffFLIPGrid = u;
 
 		v.data.reserve(v.columns * v.rows);
 		//initialize u velocity component
@@ -145,7 +178,8 @@ public:
 			}
 		}
 		v_backbuffer = v;
-
+		vWeight = v;
+		vDiffFLIPGrid = v;
 
 	}
 
@@ -209,6 +243,20 @@ public:
 	}
 
 	/*
+	Gets Incremental Velocity Fromthe Diff Velocity Fields for FLIP
+	*/
+	Eigen::Vector2f getIncrementalVelocity(Eigen::Vector2f pos)
+	{
+
+		//bilinearly interpolate u's
+		float uinc_final = getVelocityUInc(pos);
+		float vinc_final = getVelocityVInc(pos);
+
+		return Eigen::Vector2f(uinc_final, vinc_final);
+
+	}
+
+	/*
 	Gets u component of velocity at a point by interpolating the grid
 	*/
 	float getVelocityU(Eigen::Vector2f pos)
@@ -238,6 +286,35 @@ public:
 	}
 
 	/*
+	Gets u incremental component of velocity at a point by interpolating the diff grids for FLIP
+	*/
+	float getVelocityUInc(Eigen::Vector2f pos)
+	{
+		GridCoordinates blCoords; //u edge bottom left grid coords of cell
+		GridCoordinates trCoords; // u edge at top left grid coords of cell
+
+		blCoords.j = (int)(pos.x() / dx);
+		blCoords.i = (int)((pos.y() - dx / 2.0f) / dx);
+
+		trCoords.j = blCoords.j + 1;
+		trCoords.i = blCoords.i + 1;
+
+		Eigen::Vector2f blPos(blCoords.j*dx, blCoords.i*dx + dx / 2.0f); // position of bottom left vertex (even if not in window)
+
+		projectUIndicesToBoundary(blCoords, trCoords);
+
+		float r_x = (pos.x() - blPos.x()) / dx; //fraction of distance in cell beyond bottom x
+		float r_y = (pos.y() - blPos.y()) / dx; // fraction of distance in cell above bottom y
+
+		//bilinear interpolation
+		float u_x1, u_x2, u_final;
+		u_x1 = uDiffFLIPGrid.getIndex(blCoords.i, blCoords.j)*(1 - r_x) + uDiffFLIPGrid.getIndex(blCoords.i, trCoords.j)*r_x;
+		u_x2 = uDiffFLIPGrid.getIndex(trCoords.i, blCoords.j)*(1 - r_x) + uDiffFLIPGrid.getIndex(trCoords.i, trCoords.j)*r_x;
+		u_final = u_x1 * (1 - r_y) + u_x2 * r_y;
+		return u_final;
+	}
+
+	/*
 	Gets v component of velocity at a point by interpolating the grid
 	*/
 	float getVelocityV(Eigen::Vector2f pos)
@@ -259,6 +336,33 @@ public:
 		float v_x1, v_x2, v_final;
 		v_x1 = v.getIndex(blCoords.i, blCoords.j)*(1 - r_x) + v.getIndex(blCoords.i, trCoords.j)*r_x;
 		v_x2 = v.getIndex(trCoords.i, blCoords.j)*(1 - r_x) + v.getIndex(trCoords.i, trCoords.j)*r_x;
+		v_final = v_x1 * (1 - r_y) + v_x2 * r_y;
+
+		return v_final;
+	}
+
+	/*
+	Gets v incremental component of velocity at a point by interpolating the diff grids for FLIP
+	*/
+	float getVelocityVInc(Eigen::Vector2f pos)
+	{
+		GridCoordinates blCoords; //u edge bottom left grid coords of cell
+		GridCoordinates trCoords; // u edge at top left grid coords of cell
+		//bilinearly interpolate v's
+		blCoords.i = (int)(pos.y() / dx);
+		blCoords.j = (int)((pos.x() - dx / 2.0f) / dx);
+		trCoords.j = blCoords.j + 1;
+		trCoords.i = blCoords.i + 1;
+		Eigen::Vector2f blPos = Eigen::Vector2f(blCoords.j*dx + dx / 2.0f, blCoords.i*dx);
+
+		projectVIndicesToBoundary(blCoords, trCoords);
+		float r_x = (pos.x() - blPos.x()) / dx; //fraction of distance in cell beyond bottom x
+		float r_y = (pos.y() - blPos.y()) / dx; // fraction of distance in cell above bottom y
+
+			//bilinear interpolation
+		float v_x1, v_x2, v_final;
+		v_x1 = vDiffFLIPGrid.getIndex(blCoords.i, blCoords.j)*(1 - r_x) + vDiffFLIPGrid.getIndex(blCoords.i, trCoords.j)*r_x;
+		v_x2 = vDiffFLIPGrid.getIndex(trCoords.i, blCoords.j)*(1 - r_x) + vDiffFLIPGrid.getIndex(trCoords.i, trCoords.j)*r_x;
 		v_final = v_x1 * (1 - r_y) + v_x2 * r_y;
 
 		return v_final;
@@ -429,6 +533,84 @@ public:
 		v_backbuffer.rows = 0;
 		v_backbuffer.columns = 0;
 
+	}
+
+	/*
+	Sets all components of velocity field to zero
+	*/
+	void zero()
+	{
+		u.zero();
+		v.zero();
+		u_backbuffer.zero();
+		v_backbuffer.zero();
+		uWeight.zero();
+		vWeight.zero();
+	}
+
+	/*
+	Divides velocity grids by kernel weights
+	*/
+	void divideVelByKernelWeights()
+	{
+
+		// go through u component
+		for (int i = 0; i < u.rows; i++)
+		{
+			for (int j = 0; j < u.columns; j++)
+			{
+				if (uWeight.getIndex(i, j) > 0.0f)
+					u.setIndex(i, j, u.getIndex(i, j) / uWeight.getIndex(i, j));
+			}
+		}
+
+		// go through v component
+		for (int i = 0; i < v.rows; i++)
+		{
+			for (int j = 0; j < v.columns; j++)
+			{
+				if (vWeight.getIndex(i, j) > 0.0f)
+					v.setIndex(i, j, v.getIndex(i, j) / vWeight.getIndex(i, j));
+			}
+		}
+
+		u_backbuffer = u;
+		v_backbuffer = v;
+
+	}
+
+	/*
+	Save FLIP grids for later use
+	*/
+	void saveFLIPGrids()
+	{
+		uTempFLIPGrid = u;
+		vTempFLIPGrid = v;
+	}
+
+	/*
+	Calculates the difference between uTempFLIPGrid and u, vTempFLIPGrid and v
+	*/
+	void calculateFLIPDiffGrids()
+	{
+		
+		//get u diff frist;
+		for (int i = 0; i < u.rows; i++)
+		{
+			for (int j = 0; j < u.columns; j++)
+			{
+				uDiffFLIPGrid.setIndex(i, j, u.getIndex(i, j) - uTempFLIPGrid.getIndex(i, j));
+			}
+		}
+
+		//get v diff second;
+		for (int i = 0; i < v.rows; i++)
+		{
+			for (int j = 0; j < v.columns; j++)
+			{
+				vDiffFLIPGrid.setIndex(i, j, v.getIndex(i, j) - vTempFLIPGrid.getIndex(i, j));
+			}
+		}
 	}
 
 	/*
