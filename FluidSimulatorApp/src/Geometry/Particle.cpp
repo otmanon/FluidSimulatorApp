@@ -1,13 +1,14 @@
 #include "Particle.h"
 
 Particle::Particle(glm::vec2 position, float radius)
-	: Circle(radius, position),	m_Velocity(0, 0), m_Acceleration(0, 0)
+	: Circle(radius, position, 6),	m_Velocity(0, 0), m_Acceleration(0, 0)
 {
 
 }
 
 void Particle::DestroyParticle()
 {
+	
 	Particle::DestroyCircle();
 }
 

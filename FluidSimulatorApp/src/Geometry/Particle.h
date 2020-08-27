@@ -1,6 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
-
+#include <Eigen/Dense>
 #include "Circle.h"
 class Particle : public Circle
 {
@@ -31,6 +31,6 @@ public:
 	void normalizeVelocity(float magnitude);
 
 
-
+	Eigen::Vector2f getVelocity() { return Eigen::Vector2f(m_Velocity.x, m_Velocity.y); }
 	
 };

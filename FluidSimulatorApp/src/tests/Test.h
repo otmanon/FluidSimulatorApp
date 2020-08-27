@@ -17,8 +17,12 @@ namespace test {
 		virtual void OnUpdate(float deltaTime) {}
 		virtual void render(){}
 		virtual void onImGuiRender(){}
-		virtual void step(float dt) {}
+		virtual void step() {}
 		virtual void onWindowResize() {}
+		/*
+		X and Y are window coordinates of the mouse (in pixels)
+		*/
+		virtual void onMouseClick(float x, float y) {}
 
 	};
 

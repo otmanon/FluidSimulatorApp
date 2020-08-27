@@ -25,6 +25,19 @@
 
 static unsigned int HEIGHT = 1080, WIDTH = 1920;
 static bool windowResizeEvent = false;
+static bool mouse_pressed = false;
+
+
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	std::cout << "HIIIIII" << std::endl;
+}
+static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+	std::cout << "HIIIIII" << std::endl;
+
+}
 
 static void resizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -33,6 +46,13 @@ static void resizeCallback(GLFWwindow* window, int width, int height)
 	GLCall(glViewport(0, 0, width, height));
 	windowResizeEvent = true;
 };
+
+
+
+static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+//	std::cout << "Cursor Position at (" << xpos << " : " << ypos << std::endl;
+}
 int main(void)
 {
 	GLFWwindow* window;
@@ -63,9 +83,10 @@ int main(void)
 	if (glewInit() != GLEW_OK) {
 		std::cout << "Error!" << std::endl;
 	}
-
+	glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 	glfwSetWindowSizeCallback(window, resizeCallback);
-
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	//glfwSetCursorPosCallback(window, cursor_position_callback);
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
 	{
@@ -88,7 +109,8 @@ int main(void)
 		testMenu->RegisterTest<test::TestGrid>("Grid", &HEIGHT, &WIDTH);
 		GLCall(glViewport(0, 0, WIDTH, HEIGHT));
 
-
+		int timer_period = 50;
+		int counter = timer_period;
 		while (!glfwWindowShouldClose(window))
 		{
 
@@ -100,9 +122,10 @@ int main(void)
 
 			if (currentTest) {
 		
-				currentTest->step(0.005);
+				currentTest->step();
 				currentTest->render();
 				ImGui::Begin("Test");
+
 				if (currentTest != testMenu && ImGui::Button("<-"))
 				{
 					delete currentTest;
@@ -121,6 +144,21 @@ int main(void)
 
 			if (windowResizeEvent)
 				currentTest->onWindowResize();
+
+			int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+			if (state == GLFW_PRESS)// && counter == timer_period)
+			{
+				double xpos, ypos;
+				glfwGetCursorPos(window, &xpos, &ypos);
+				currentTest->onMouseClick(xpos, ypos);
+				counter = 0;
+			}else if (state == GLFW_PRESS && counter != timer_period)
+			{
+				counter++;
+			}else
+			{
+				counter = timer_period;
+			}
 
 		}
 		delete currentTest;

@@ -37,7 +37,7 @@ namespace test {
 		void render() override;
 		void onImGuiRender() override;
 
-		void step(float dt) override;
+		void step() override;
 
 		void maintainDesiredCount();
 

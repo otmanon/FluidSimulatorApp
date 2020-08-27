@@ -7,11 +7,11 @@
 Circle::Circle(float radius, glm::vec2 pos, unsigned int count)
 	: m_Radius(radius), m_Position(pos), m_NumVertices(count), m_Model(glm::mat4(1.0f))
 {
+
 	buildPositions();
 	buildIndices();
 	std::string shaderpath = "shaders/SolidColor.shader";
 	Circle::buildOpenGLObjects(m_Vertices.data(), m_Indices.data(), 2, m_Vertices.size(), m_Indices.size(), true, shaderpath);
-
 }
 
 
@@ -23,7 +23,7 @@ void Circle::DestroyCircle()
 
 void Circle::buildPositions()
 {
-	m_Vertices = std::vector<float>(2 * m_NumVertices);
+	
 
 	float theta = 0;
 	float increment = 2 * glm::pi<float>() / m_NumVertices;
@@ -37,14 +37,10 @@ void Circle::buildPositions()
 
 void Circle::buildIndices()
 {
-	m_Indices = std::vector<unsigned int>(m_NumVertices);
 	for (unsigned int i = 0; i < m_NumVertices; i++) {
 		m_Indices[i] = i;
 	}
 }
-
-
-
 
 void Circle::render(glm::mat4& proj, glm::mat4& view) const
 {

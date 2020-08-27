@@ -33,6 +33,9 @@ public:
 
 	void updateVertexBuffer(float * data, unsigned int * indices, unsigned int num_attribs, unsigned int v_count, unsigned int i_count)
 	{
+		m_vb->Unbind();
+		m_va->Unbind();
+		m_ib->Unbind();
 		delete m_vb;
 		delete m_ib;
 		delete m_va;
@@ -77,6 +80,9 @@ public:
 
 	virtual void DestroyDrawable()
 	{
+		m_vb->Unbind();
+		m_va->Unbind();
+		m_ib->Unbind();
 		delete m_vb;
 		delete m_va;
 		delete m_ib;

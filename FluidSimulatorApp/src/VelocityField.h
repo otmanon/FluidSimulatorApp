@@ -101,7 +101,7 @@ public:
 	/*
 	Scale for visualizing velocity field;
 	*/
-	float vis_scale = 10.0f;
+	float vis_scale = 1.0f;
 	
 	/*
 	Draw velocity field from edges
@@ -179,12 +179,19 @@ public:
 	*/
 	void updateOpenGLData()
 	{
+		if (drawFieldEdgeWise || centeredVF.drawFieldCenterWise)
+		{
+			buildVerticesEdgeWise();
+			
+			updateVertexBuffer(vertices.data(), indices.data(), 2, vertices.size(), indices.size());
 
-		buildVerticesEdgeWise();
-		buildVerticesCenterWise();
-		updateVertexBuffer(vertices.data(), indices.data(), 2, vertices.size(), indices.size());
+		}
+		if (centeredVF.drawFieldCenterWise)
+		{
+			buildVerticesCenterWise();
+			centeredVF.updateOpenGLData();
+		}
 
-		centeredVF.updateOpenGLData();
 	}
 
 	/*

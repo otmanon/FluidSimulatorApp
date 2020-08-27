@@ -58,8 +58,9 @@ namespace test {
 
 	}
 
-	void TestParticles::step(float dt)
+	void TestParticles::step()
 	{
+		float dt = 0.05f;
 		maintainDesiredCount();
 
 		int maxh = *m_WindowHeightPtr/2;
